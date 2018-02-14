@@ -25,6 +25,7 @@
   "homepage": "https://github.com/aragon/apm.js#readme",
   "dependencies": {
     "ethereum-ens": "^0.7.3",
-    "ipfs-api": "^17.5.0"
+    "ipfs-api": "^17.5.0",
+    "semver": "^5.5.0"
   }
 }
