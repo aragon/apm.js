@@ -25,6 +25,7 @@
   "homepage": "https://github.com/aragon/apm.js#readme",
   "dependencies": {
     "ipfs-api": "^17.5.0",
+    "semver": "^5.5.0",
     "stream-to-string": "^1.1.0"
   }
 }
