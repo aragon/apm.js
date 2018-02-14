@@ -1,16 +1,25 @@
 const ipfs = require('./providers/ipfs')
-const fs = require('./providers/fs')
-const ens = require('./ens')
+const ens = require('../ens')
 const semver = require('semver')
 
-module.exports = (web3, opts = {
-  ensRegistryAddress: null
-}) => {
-  // Set up providers
-  const providers = {
-    ipfs: ipfs(opts.ipfs),
-    fs: fs(opts.fs)
+module.exports = (web3, options = {}) => {
+  const defaultOptions = {
+    ensRegistryAddress: null,
+    providers: {}
   }
+  options = Object.assign(
+    defaultOptions,
+    options
+  )
+
+  // Set up providers
+  const defaultProviders = {
+    ipfs: ipfs(opts.ipfs)
+  }
+  const providers = Object.assign(
+    defaultProviders,
+    options.providers
+  )
 
   const readFileFromApplication = (contentURI, path) => {
     const [contentProvider, contentLocation] = contentURI.split(':')

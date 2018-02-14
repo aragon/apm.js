@@ -1,10 +1,11 @@
 const ipfsAPI = require('ipfs-api')
-const streamToString = require('stream-to-string')
 
 module.exports = (opts = {}) => {
   const ipfs = ipfsAPI(opts.rpc)
 
   return {
+    identifier: 'ipfs',
+
     /**
      * Gets the file at `path` from the content URI `hash`.
      *
@@ -14,7 +15,7 @@ module.exports = (opts = {}) => {
      */
     getFile (hash, path) {
       return ipfs.files.cat(`${hash}/${path}`)
-        .then((file) => streamToString(file))
+        .then((file) => file.toString('utf8'))
     },
     /**
      * Uploads all files from `path` and returns the content URI for those files.
