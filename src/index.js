@@ -1,6 +1,6 @@
-const ipfs = require('./storage/ipfs')
-const fs = require('./storage/fs')
-const ens = require('../ens')
+const ipfs = require('./providers/ipfs')
+const fs = require('./providers/fs')
+const ens = require('./ens')
 const semver = require('semver')
 
 module.exports = (web3, opts = {
@@ -55,6 +55,8 @@ module.exports = (web3, opts = {
   }
 
   return {
+    getFile: readFileFromApplication,
+
     /**
      * Get the APM repository registry contract for `appId`.
      *
