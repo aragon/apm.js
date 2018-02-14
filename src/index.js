@@ -78,7 +78,7 @@ module.exports = (web3, options = {}) => {
       return ens.resolve(repoId, web3, options.ensRegistryAddress)
         .then(
           (address) => new web3.eth.Contract(
-            require('../../abi/apm/RepoRegistry.json'),
+            require('../abi/RepoRegistry.json'),
             address
           )
         )
@@ -93,7 +93,7 @@ module.exports = (web3, options = {}) => {
       return ens.resolve(appId, web3, options.ensRegistryAddress)
         .then(
           (address) => new web3.eth.Contract(
-            require('../../abi/apm/Repo.json'),
+            require('../abi/Repo.json'),
             address
           )
         )
