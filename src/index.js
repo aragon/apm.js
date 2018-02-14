@@ -55,6 +55,8 @@ module.exports = (web3, opts = {
   }
 
   return {
+    getFile: readFileFromApplication,
+
     /**
      * Get the APM repository registry contract for `appId`.
      *
