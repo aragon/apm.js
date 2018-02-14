@@ -1,6 +1,6 @@
 const ipfs = require('./providers/ipfs')
 const fs = require('./providers/fs')
-const ens = require('../ens')
+const ens = require('./ens')
 const semver = require('semver')
 
 module.exports = (web3, opts = {
