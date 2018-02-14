@@ -1,5 +1,5 @@
 const ipfs = require('./providers/ipfs')
-const ens = require('../ens')
+const ens = require('./ens')
 const semver = require('semver')
 
 module.exports = (web3, options = {}) => {
@@ -14,7 +14,7 @@ module.exports = (web3, options = {}) => {
 
   // Set up providers
   const defaultProviders = {
-    ipfs: ipfs(opts.ipfs)
+    ipfs: ipfs(options.ipfs)
   }
   const providers = Object.assign(
     defaultProviders,
@@ -75,7 +75,7 @@ module.exports = (web3, options = {}) => {
     getRepoRegistry (appId) {
       const repoId = appId.split('.').slice(1).join('.')
 
-      return ens.resolve(repoId, web3, opts.ensRegistryAddress)
+      return ens.resolve(repoId, web3, options.ensRegistryAddress)
         .then(
           (address) => new web3.eth.Contract(
             require('../../abi/apm/RepoRegistry.json'),
@@ -90,7 +90,7 @@ module.exports = (web3, options = {}) => {
      * @return {Promise} A promise that resolves to the Web3 contract
      */
     getRepository (appId) {
-      return ens.resolve(appId, web3, opts.ensRegistryAddress)
+      return ens.resolve(appId, web3, options.ensRegistryAddress)
         .then(
           (address) => new web3.eth.Contract(
             require('../../abi/apm/Repo.json'),
