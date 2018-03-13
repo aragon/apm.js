@@ -22,7 +22,7 @@ module.exports = (web3, options = {}) => {
   )
 
   const readFileFromApplication = (contentURI, path) => {
-    const [contentProvider, contentLocation] = contentURI.split(':')
+    const [contentProvider, contentLocation] = contentURI.split(/:(.+)/)
 
     if (!contentProvider || !contentLocation) {
       throw new Error(`Invalid content URI (expected format was "<provider>:<identifier>")`)
