@@ -1,21 +1,19 @@
-const ENS = require('ethereum-ens')
+const ENS = require('ethjs-ens')
 
 module.exports = {
-  /**
-   * Get the address of an ENS name.
-   *
-   * @param  {string} name
-   * @param  {object} web3
-   * @param  {string} [registryAddress=null]
-   * @return {Promise<string>} The resolved address
-   */
-  resolve (name, web3, registryAddress = null) {
-    // Monkey patch for Web3 1.0 -> Web3 0.x
-    let provider = web3.currentProvider
-    provider.sendAsync = provider.send
+  resolve (nameOrNode, opts = {}) {
+    const isName = nameOrNode.includes('.')
 
-    const ens = new ENS(provider, registryAddress)
+    // Stupid hack for ethjs-ens
+    if (!opts.provider.sendAsync) {
+      opts.provider.sendAsync = opts.provider.send
+    }
 
-    return ens.resolver(name).addr()
+    const ens = new ENS(opts)
+    if (isName) {
+      return ens.lookup(nameOrNode)
+    }
+
+    return ens.resolveAddressForNode(nameOrNode)
   }
 }

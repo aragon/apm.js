@@ -21,6 +21,12 @@ module.exports = (web3, options = {}) => {
     options.providers
   )
 
+  // Construct ENS options
+  const ensOptions = {
+    provider: web3.currentProvider,
+    ensRegistryAddress: options.ensRegistryAddress
+  }
+
   const readFileFromApplication = (contentURI, path) => {
     const [contentProvider, contentLocation] = contentURI.split(/:(.+)/)
 
@@ -75,7 +81,7 @@ module.exports = (web3, options = {}) => {
     getRepoRegistry (appId) {
       const repoId = appId.split('.').slice(1).join('.')
 
-      return ens.resolve(repoId, web3, options.ensRegistryAddress)
+      return ens.resolve(repoId, ensOptions)
         .then(
           (address) => new web3.eth.Contract(
             require('../abi/RepoRegistry.json'),
@@ -90,7 +96,7 @@ module.exports = (web3, options = {}) => {
      * @return {Promise} A promise that resolves to the Web3 contract
      */
     getRepository (appId) {
-      return ens.resolve(appId, web3, options.ensRegistryAddress)
+      return ens.resolve(appId, ensOptions)
         .then(
           (address) => new web3.eth.Contract(
             require('../abi/Repo.json'),

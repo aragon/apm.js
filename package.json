@@ -24,9 +24,9 @@
   },
   "homepage": "https://github.com/aragon/apm.js#readme",
   "dependencies": {
-    "ethereum-ens": "https://github.com/Arachnid/ensjs.git#03c7f5946b2a1064bfef80b7f844bfb966e762da",
+    "ethjs-ens": "^2.0.1",
+    "got": "^8.3.0",
     "ipfs-api": "^17.5.0",
-    "semver": "^5.5.0",
-    "got": "^8.3.0"
+    "semver": "^5.5.0"
   }
 }
