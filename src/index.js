@@ -24,7 +24,7 @@ module.exports = (web3, options = {}) => {
   // Construct ENS options
   const ensOptions = {
     provider: web3.currentProvider,
-    ensRegistryAddress: options.ensRegistryAddress
+    registryAddress: options.ensRegistryAddress
   }
 
   const readFileFromApplication = (contentURI, path) => {
