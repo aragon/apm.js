@@ -125,6 +125,13 @@ module.exports = (web3, options = {}) => {
         )
         .then(returnVersion(web3))
     },
+    getLatestVersionContract (appId) {
+      return this.getRepository(appId)
+        .then((repository) =>
+          repository.methods.getLatest().call()
+        )
+        .then(({ contractAddress }) => contractAddress)
+    },
     getLatestVersionForContract (appId, address) {
       return this.getRepository(appId)
         .then((repository) =>
