@@ -58,6 +58,12 @@ module.exports = (web3, options = {}) => {
           )
         }
       )
+      .catch(() => {
+        const [provider, location] = contentURI.split(':')
+        return {
+          content: { provider, location }
+        }
+      })
   }
 
   function returnVersion (web3) {
