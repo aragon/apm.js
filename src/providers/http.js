@@ -26,7 +26,7 @@ module.exports = (opts = {}) => {
      *
      * @param {string} hash The content URI hash
      * @param {string} path The path to the file
-     * @return {Stream} A stream that resolves to the contents of the file
+     * @return {Stream} A stream representing the content of the file
      */
     getFileStream (host, path) {
       return got.stream(`${host}/${path}`)
