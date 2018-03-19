@@ -27,7 +27,7 @@ module.exports = (web3, options = {}) => {
     registryAddress: options.ensRegistryAddress
   }
 
-  const readFileFromApplication = (contentURI, path) => {
+  const getProviderFromURI = (contentURI, path) => {
     const [contentProvider, contentLocation] = contentURI.split(/:(.+)/)
 
     if (!contentProvider || !contentLocation) {
@@ -38,7 +38,17 @@ module.exports = (web3, options = {}) => {
       throw new Error(`The storage provider "${contentProvider}" is not supported`)
     }
 
-    return providers[contentProvider].getFile(contentLocation, path)
+    return { provider: providers[contentProvider], location: contentLocation }
+  }
+
+  const readFileFromApplication = (contentURI, path) => {
+    const { provider, location } = getProviderFromURI(contentURI, path)
+    return provider.getFile(location, path)
+  }
+
+  const readFileStreamFromApplication = (contentURI, path) => {
+    const { provider, location } = getProviderFromURI(contentURI, path)
+    return provider.getFileStream(location, path)
   }
 
   const getApplicationInfo = (contentURI) => {
@@ -77,6 +87,7 @@ module.exports = (web3, options = {}) => {
 
   return {
     getFile: readFileFromApplication,
+    getFileStream: readFileStreamFromApplication,
 
     /**
      * Get the APM repository registry contract for `appId`.
