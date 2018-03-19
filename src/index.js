@@ -27,7 +27,7 @@ module.exports = (web3, options = {}) => {
     registryAddress: options.ensRegistryAddress
   }
 
-  const getProviderFromURI = (contentURI, path, cb) => {
+  const getProviderFromURI = (contentURI, path) => {
     const [contentProvider, contentLocation] = contentURI.split(/:(.+)/)
 
     if (!contentProvider || !contentLocation) {
