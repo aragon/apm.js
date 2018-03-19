@@ -17,6 +17,18 @@ module.exports = (opts = {}) => {
       return ipfs.files.cat(`${hash}/${path}`)
         .then((file) => file.toString('utf8'))
     },
+
+    /**
+     * Gets the file stream at `path` from the content URI `hash`.
+     *
+     * @param {string} hash The content URI hash
+     * @param {string} path The path to the file
+     * @return {Stream} A stream that resolves to the contents of the file
+     */
+    getFileStream (hash, path) {
+      return ipfs.files.catReadableStream(`${hash}/${path}`)
+    },
+
     /**
      * Uploads all files from `path` and returns the content URI for those files.
      *

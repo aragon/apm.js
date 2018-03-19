@@ -20,6 +20,18 @@ module.exports = (opts = {}) => {
       return got(`${host}/${path}`)
         .then((response) => response.body)
     },
+
+    /**
+     * Gets the file stream at `path` from the content URI `hash`.
+     *
+     * @param {string} hash The content URI hash
+     * @param {string} path The path to the file
+     * @return {Stream} A stream that resolves to the contents of the file
+     */
+    getFileStream (host, path) {
+      return got.stream(`${host}/${path}`)
+    },
+
     /**
      * Uploads all files from `path` and returns the content URI for those files.
      *
