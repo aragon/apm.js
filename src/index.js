@@ -161,10 +161,13 @@ module.exports = (web3, options = {}) => {
         .then((repository) =>
           repository.methods.getVersionsCount().call()
         )
-        .then((versionCount) => Promise.all(
-          Array(versionCount).fill().map((_, versionId) =>
-            this.getVersionById(appId, versionId))
-        ))
+        .then((versionCount) => {
+          const versions = []
+          for (let i = 1; i < versionCount; i++) {
+            versions.push(this.getVersionById(appId, i))
+          }
+          return Promise.all(versions)
+        })
     },
     /**
      * Publishes a new version (`version`) of `appId` using storage provider `provider`.
