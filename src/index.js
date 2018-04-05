@@ -101,7 +101,7 @@ module.exports = (web3, options = {}) => {
       return ens.resolve(repoId, ensOptions)
         .then(
           (address) => new web3.eth.Contract(
-            require('../abi/RepoRegistry.json'),
+            require('@aragon/os/build/contracts/RepoRegistry.json').abi,
             address
           )
         )
@@ -116,7 +116,7 @@ module.exports = (web3, options = {}) => {
       return ens.resolve(appId, ensOptions)
         .then(
           (address) => new web3.eth.Contract(
-            require('../abi/Repo.json'),
+            require('@aragon/os/build/contracts/Repo.json').abi,
             address
           )
         )

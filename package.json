@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/aragon/apm.js#readme",
   "dependencies": {
+    "@aragon/os": "^3.1.2",
     "ethjs-ens": "^2.0.1",
     "got": "^8.3.0",
     "ipfs-api": "^17.5.0",
