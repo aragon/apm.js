@@ -2,6 +2,8 @@ const ipfs = require('./providers/ipfs')
 const ens = require('./ens')
 const semver = require('semver')
 
+const GAS_FUZZ_FACTOR = 1.5
+
 module.exports = (web3, options = {}) => {
   const defaultOptions = {
     ensRegistryAddress: null,
@@ -101,7 +103,7 @@ module.exports = (web3, options = {}) => {
       return ens.resolve(repoId, ensOptions)
         .then(
           (address) => new web3.eth.Contract(
-            require('@aragon/os/build/contracts/RepoRegistry.json').abi,
+            require('@aragon/os/build/contracts/APMRegistry.json').abi,
             address
           )
         )
@@ -177,6 +179,7 @@ module.exports = (web3, options = {}) => {
      *
      * Returns the raw transaction to sign.
      *
+     * @param {string} manager The address that has access to manage this repository.
      * @param {string} appId The ENS name for the application repository.
      * @param {string} version A valid semantic version for this version.
      * @param {string} provider The name of an APM storage provider.
@@ -184,7 +187,7 @@ module.exports = (web3, options = {}) => {
      * @param {string} contract The new contract address for this version.
      * @return {Promise} A promise that resolves to a raw transaction
      */
-    async publishVersion (appId, version, provider, directory, contract) {
+    async publishVersion (manager, appId, version, provider, directory, contract) {
       if (!semver.valid(version)) {
         throw new Error(`${version} is not a valid semantic version`)
       }
@@ -211,6 +214,7 @@ module.exports = (web3, options = {}) => {
       let transactionDestination = repoRegistry.options.address
       let call = repoRegistry.methods.newRepoWithVersion(
         appId.split('.')[0],
+        manager,
         version.split('.').map((part) => parseInt(part)),
         contract,
         `0x${contentURI}`
@@ -234,8 +238,9 @@ module.exports = (web3, options = {}) => {
         return {
           to: transactionDestination,
           data: call.encodeABI(),
-          gas: await call.estimateGas(),
-          gasPrice: await web3.eth.getGasPrice()
+          gas: await call.estimateGas() * GAS_FUZZ_FACTOR,
+          gasPrice: 1,
+          nonce: await web3.eth.getTransactionCount(manager)
         }
       } catch (err) {
         throw new Error(`Transaction would not succeed ("${err.message}")`)
