@@ -165,7 +165,7 @@ module.exports = (web3, options = {}) => {
         )
         .then((versionCount) => {
           const versions = []
-          for (let i = 1; i < versionCount; i++) {
+          for (let i = 1; i <= versionCount; i++) {
             versions.push(this.getVersionById(appId, i))
           }
           return Promise.all(versions)
