@@ -53,6 +53,9 @@ module.exports = (web3, options = {}) => {
     return provider.getFileStream(location, path)
   }
 
+  const formatVersion = version =>
+    version.split('.').map((part) => parseInt(part))
+
   const getApplicationInfo = (contentURI) => {
     return Promise.all([
       readFileFromApplication(contentURI, 'manifest.json'),
@@ -83,11 +86,13 @@ module.exports = (web3, options = {}) => {
       getApplicationInfo(web3.utils.hexToAscii(version.contentURI))
         .then((info) =>
           Object.assign(info, {
-            contractAddress: version.contractAddress
+            contractAddress: version.contractAddress,
+            version: version.semanticVersion.join('.')
           }))
   }
 
   return {
+    validInitialVersions: ['0.0.1', '0.1.0', '1.0.0'],
     getFile: readFileFromApplication,
     getFileStream: readFileStreamFromApplication,
 
@@ -171,6 +176,12 @@ module.exports = (web3, options = {}) => {
           return Promise.all(versions)
         })
     },
+    isValidBump (appId, fromVersion, toVersion) {
+      return this.getRepository(appId)
+        .then((repo) => (
+          repo.methods.isValidBump(formatVersion(fromVersion), formatVersion(toVersion)).call()
+        ))
+    },
     /**
      * Publishes a new version (`version`) of `appId` using storage provider `provider`.
      *
@@ -215,7 +226,7 @@ module.exports = (web3, options = {}) => {
       let call = repoRegistry.methods.newRepoWithVersion(
         appId.split('.')[0],
         manager,
-        version.split('.').map((part) => parseInt(part)),
+        formatVersion(version),
         contract,
         `0x${contentURI}`
       )
@@ -224,7 +235,7 @@ module.exports = (web3, options = {}) => {
       if (repo !== null) {
         transactionDestination = repo.options.address
         call = repo.methods.newVersion(
-          version.split('.').map((part) => parseInt(part)),
+          formatVersion(version),
           contract,
           `0x${contentURI}`
         )
