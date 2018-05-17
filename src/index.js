@@ -91,6 +91,10 @@ module.exports = (web3, options = {}) => {
           }))
   }
 
+  function getRepoId (appId) {
+    return appId.split('.').slice(1).join('.')
+  }
+
   return {
     validInitialVersions: ['0.0.1', '0.1.0', '1.0.0'],
     getFile: readFileFromApplication,
@@ -99,13 +103,25 @@ module.exports = (web3, options = {}) => {
     ensResolve: (name) => ens.resolve(name, ensOptions),
 
     /**
+     * Get the APM repository registry address for `appId`.
+     *
+     * @param {string} appId
+     * @return {Promise} A promise that resolves to the APM address
+     */
+    getRepoRegistryAddress (appId) {
+      const repoId = getRepoId(appId)
+
+      return ens.resolve(repoId, ensOptions)
+    },
+
+    /**
      * Get the APM repository registry contract for `appId`.
      *
      * @param {string} appId
      * @return {Promise} A promise that resolves to the Web3 contract
      */
     getRepoRegistry (appId) {
-      const repoId = appId.split('.').slice(1).join('.')
+      const repoId = getRepoId(appId)
 
       return ens.resolve(repoId, ensOptions)
         .then(
