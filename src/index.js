@@ -96,6 +96,8 @@ module.exports = (web3, options = {}) => {
     getFile: readFileFromApplication,
     getFileStream: readFileStreamFromApplication,
 
+    ensResolve: (name) => ens.resolve(name, ensOptions),
+
     /**
      * Get the APM repository registry contract for `appId`.
      *
