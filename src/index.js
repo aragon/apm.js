@@ -200,7 +200,7 @@ module.exports = (web3, options = {}) => {
      * @param {string} contract The new contract address for this version.
      * @return {Promise} A promise that resolves to a raw transaction
      */
-    async publishVersion (manager, appId, version, provider, directory, contract) {
+    async publishVersion (manager, appId, version, provider, directory, contract, from) {
       if (!semver.valid(version)) {
         throw new Error(`${version} is not a valid semantic version`)
       }
@@ -245,13 +245,13 @@ module.exports = (web3, options = {}) => {
 
       try {
         // Test that the call would actually succeed
-        await call.call()
+        await call.call({ from })
 
         // Return transaction to sign
         return {
           to: transactionDestination,
           data: call.encodeABI(),
-          gas: await call.estimateGas() * GAS_FUZZ_FACTOR,
+          gas: await call.estimateGas({ from }) * GAS_FUZZ_FACTOR,
           gasPrice: 1,
           nonce: await web3.eth.getTransactionCount(manager)
         }
