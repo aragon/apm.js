@@ -252,7 +252,7 @@ module.exports = (web3, options = {}) => {
           to: transactionDestination,
           data: call.encodeABI(),
           gas: await call.estimateGas({ from }) * GAS_FUZZ_FACTOR,
-          gasPrice: 1,
+          gasPrice: web3.utils.toWei('10', 'gwei'),
           nonce: await web3.eth.getTransactionCount(manager)
         }
       } catch (err) {
