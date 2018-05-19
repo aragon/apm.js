@@ -3,6 +3,7 @@ const ens = require('./ens')
 const semver = require('semver')
 
 const GAS_FUZZ_FACTOR = 1.5
+const GET_INFO_TIMEOUT = 1000 //ms
 
 module.exports = (web3, options = {}) => {
   const defaultOptions = {
@@ -56,6 +57,26 @@ module.exports = (web3, options = {}) => {
   const formatVersion = version =>
     version.split('.').map((part) => parseInt(part))
 
+  // https://gist.github.com/john-doherty/bcf35d39d8b30d01ae51ccdecf6c94f5
+  function promiseTimeout(ms, promise){
+    return new Promise(function(resolve, reject){
+      // create a timeout to reject promise if not resolved
+      var timer = setTimeout(function(){
+        reject(new Error("promise timeout"));
+      }, ms);
+
+      promise
+        .then(function(res){
+          clearTimeout(timer);
+          resolve(res);
+        })
+        .catch(function(err){
+          clearTimeout(timer);
+          reject(err);
+        });
+    });
+  };
+
   const getApplicationInfo = (contentURI) => {
     return Promise.all([
       readFileFromApplication(contentURI, 'manifest.json'),
@@ -82,13 +103,16 @@ module.exports = (web3, options = {}) => {
   }
 
   function returnVersion (web3) {
-    return (version) =>
-      getApplicationInfo(web3.utils.hexToAscii(version.contentURI))
-        .then((info) =>
-          Object.assign(info, {
+    return (version) => {
+      return promiseTimeout(GET_INFO_TIMEOUT, getApplicationInfo(web3.utils.hexToAscii(version.contentURI)))
+        .then((info) => {
+          return Object.assign(info, {
             contractAddress: version.contractAddress,
             version: version.semanticVersion.join('.')
-          }))
+          })
+        })
+        .catch((err) => {})
+    }
   }
 
   return {
