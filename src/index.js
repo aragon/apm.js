@@ -111,7 +111,7 @@ module.exports = (web3, options = {}) => {
     getRepoRegistryAddress (appId) {
       const repoId = getRepoId(appId)
 
-      return ens.resolve(repoId, ensOptions)
+      return this.ensResolve(repoId)
     },
 
     /**
@@ -121,9 +121,7 @@ module.exports = (web3, options = {}) => {
      * @return {Promise} A promise that resolves to the Web3 contract
      */
     getRepoRegistry (appId) {
-      const repoId = getRepoId(appId)
-
-      return ens.resolve(repoId, ensOptions)
+      return this.getRepoRegistryAddress(appId)
         .then(
           (address) => new web3.eth.Contract(
             require('@aragon/os/build/contracts/APMRegistry.json').abi,
@@ -138,7 +136,7 @@ module.exports = (web3, options = {}) => {
      * @return {Promise} A promise that resolves to the Web3 contract
      */
     getRepository (appId) {
-      return ens.resolve(appId, ensOptions)
+      return this.ensResolve(appId)
         .then(
           (address) => new web3.eth.Contract(
             require('@aragon/os/build/contracts/Repo.json').abi,
