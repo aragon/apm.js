@@ -1,6 +1,7 @@
 const ipfs = require('./providers/ipfs')
 const ens = require('./ens')
 const semver = require('semver')
+const promiseTimeout = require('./utils/timeout-promise.js')
 
 const GAS_FUZZ_FACTOR = 1.5
 const GET_INFO_TIMEOUT = 1000 //ms
@@ -56,25 +57,6 @@ module.exports = (web3, options = {}) => {
 
   const formatVersion = version =>
     version.split('.').map((part) => parseInt(part))
-
-  // https://gist.github.com/john-doherty/bcf35d39d8b30d01ae51ccdecf6c94f5
-  function promiseTimeout(promise, ms){
-    return new Promise(function(resolve, reject){
-      // create a timeout to reject promise if not resolved
-      var timer = setTimeout(function(){
-        reject(new Error("promise timeout"))
-      }, ms)
-
-      promise
-        .then(function(res){
-          resolve(res)
-        })
-        .catch(function(err){
-          reject(err)
-        })
-        .finally(() => clearTimeout(timer))
-    })
-  }
 
   const getApplicationInfo = (contentURI) => {
     return Promise.all([
