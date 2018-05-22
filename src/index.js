@@ -58,24 +58,23 @@ module.exports = (web3, options = {}) => {
     version.split('.').map((part) => parseInt(part))
 
   // https://gist.github.com/john-doherty/bcf35d39d8b30d01ae51ccdecf6c94f5
-  function promiseTimeout(ms, promise){
+  function promiseTimeout(promise, ms){
     return new Promise(function(resolve, reject){
       // create a timeout to reject promise if not resolved
       var timer = setTimeout(function(){
-        reject(new Error("promise timeout"));
-      }, ms);
+        reject(new Error("promise timeout"))
+      }, ms)
 
       promise
         .then(function(res){
-          clearTimeout(timer);
-          resolve(res);
+          resolve(res)
         })
         .catch(function(err){
-          clearTimeout(timer);
-          reject(err);
-        });
-    });
-  };
+          reject(err)
+        })
+        .finally(() => clearTimeout(timer))
+    })
+  }
 
   const getApplicationInfo = (contentURI) => {
     return Promise.all([
@@ -104,7 +103,7 @@ module.exports = (web3, options = {}) => {
 
   function returnVersion (web3) {
     return (version) => {
-      return promiseTimeout(GET_INFO_TIMEOUT, getApplicationInfo(web3.utils.hexToAscii(version.contentURI)))
+      return promiseTimeout(getApplicationInfo(web3.utils.hexToAscii(version.contentURI)), GET_INFO_TIMEOUT)
         .then((info) => {
           return Object.assign(info, {
             contractAddress: version.contractAddress,
