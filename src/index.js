@@ -84,16 +84,15 @@ module.exports = (web3, options = {}) => {
   }
 
   function returnVersion (web3) {
-    return (version) => {
-      return promiseTimeout(getApplicationInfo(web3.utils.hexToAscii(version.contentURI)), GET_INFO_TIMEOUT)
-        .then((info) => {
-          return Object.assign(info, {
+    return (version) =>
+      promiseTimeout(getApplicationInfo(web3.utils.hexToAscii(version.contentURI)), GET_INFO_TIMEOUT)
+        .then((info) =>
+          Object.assign(info, {
             contractAddress: version.contractAddress,
             version: version.semanticVersion.join('.')
           })
-        })
+        )
         .catch((err) => {})
-    }
   }
 
   return {

@@ -4,7 +4,6 @@ module.exports = function(promise, ms) {
   // Create a promise that rejects in <ms> milliseconds
   const timeout = new Promise((resolve, reject) => {
     const id = setTimeout(() => {
-      clearTimeout(id);
       reject('Timed out in '+ ms + 'ms.')
     }, ms)
   })
