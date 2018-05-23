@@ -1,8 +1,10 @@
 const ipfs = require('./providers/ipfs')
 const ens = require('./ens')
 const semver = require('semver')
+const promiseTimeout = require('./utils/timeout-promise.js')
 
 const GAS_FUZZ_FACTOR = 1.5
+const GET_INFO_TIMEOUT = 1000 //ms
 
 module.exports = (web3, options = {}) => {
   const defaultOptions = {
@@ -83,12 +85,14 @@ module.exports = (web3, options = {}) => {
 
   function returnVersion (web3) {
     return (version) =>
-      getApplicationInfo(web3.utils.hexToAscii(version.contentURI))
+      promiseTimeout(getApplicationInfo(web3.utils.hexToAscii(version.contentURI)), GET_INFO_TIMEOUT)
         .then((info) =>
           Object.assign(info, {
             contractAddress: version.contractAddress,
             version: version.semanticVersion.join('.')
-          }))
+          })
+        )
+        .catch((err) => {})
   }
 
   return {
