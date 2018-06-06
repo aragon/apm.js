@@ -97,6 +97,10 @@ module.exports = (web3, options = {}) => {
     }
   }
 
+  function getRepoId (appId) {
+    return appId.split('.').slice(1).join('.')
+  }
+
   return {
     validInitialVersions: ['0.0.1', '0.1.0', '1.0.0'],
     getFile: readFileFromApplication,
@@ -105,15 +109,25 @@ module.exports = (web3, options = {}) => {
     ensResolve: (name) => ens.resolve(name, ensOptions),
 
     /**
+     * Get the APM repository registry address for `appId`.
+     *
+     * @param {string} appId
+     * @return {Promise} A promise that resolves to the APM address
+     */
+    getRepoRegistryAddress (appId) {
+      const repoId = getRepoId(appId)
+
+      return this.ensResolve(repoId)
+    },
+
+    /**
      * Get the APM repository registry contract for `appId`.
      *
      * @param {string} appId
      * @return {Promise} A promise that resolves to the Web3 contract
      */
     getRepoRegistry (appId) {
-      const repoId = appId.split('.').slice(1).join('.')
-
-      return ens.resolve(repoId, ensOptions)
+      return this.getRepoRegistryAddress(appId)
         .then(
           (address) => new web3.eth.Contract(
             require('@aragon/os/build/contracts/APMRegistry.json').abi,
@@ -128,7 +142,7 @@ module.exports = (web3, options = {}) => {
      * @return {Promise} A promise that resolves to the Web3 contract
      */
     getRepository (appId) {
-      return ens.resolve(appId, ensOptions)
+      return this.ensResolve(appId)
         .then(
           (address) => new web3.eth.Contract(
             require('@aragon/os/build/contracts/Repo.json').abi,
