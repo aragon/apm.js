@@ -1,11 +1,6 @@
 const got = require('got')
 
 module.exports = (opts = {}) => {
-  opts = Object.assign({
-    host: 'http://localhost'
-    port: 4522
-  }, opts)
-
   return {
     identifier: 'http',
 

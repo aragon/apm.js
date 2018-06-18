@@ -1,4 +1,5 @@
 const ipfsAPI = require('ipfs-api')
+const httpProvider = require('./http')()
 
 module.exports = (opts = {}) => {
   const ipfs = ipfsAPI(opts.rpc)
@@ -14,6 +15,10 @@ module.exports = (opts = {}) => {
      * @return {Promise} A promise that resolves to the contents of the file
      */
     getFile (hash, path) {
+      if (opts.gateway) {
+        return httpProvider.getFile(`${opts.gateway}/${hash}`, path)
+      }
+
       return ipfs.files.cat(`${hash}/${path}`)
         .then((file) => file.toString('utf8'))
     },
@@ -26,6 +31,10 @@ module.exports = (opts = {}) => {
      * @return {Stream} A stream representing the content of the file
      */
     getFileStream (hash, path) {
+      if (opts.gateway) {
+        return httpProvider.getFileStream(`${opts.gateway}/${hash}`, path)
+      }
+
       return ipfs.files.catReadableStream(`${hash}/${path}`)
     },
 
