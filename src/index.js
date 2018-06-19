@@ -4,7 +4,7 @@ const semver = require('semver')
 const promiseTimeout = require('./utils/timeout-promise.js')
 
 const GAS_FUZZ_FACTOR = 1.5
-const GET_INFO_TIMEOUT = 1000 //ms
+const GET_INFO_TIMEOUT = 10000 //ms
 
 module.exports = (web3, options = {}) => {
   const defaultOptions = {
