@@ -4,7 +4,7 @@ const semver = require('semver')
 const promiseTimeout = require('./utils/timeout-promise.js')
 
 const GAS_FUZZ_FACTOR = 1.5
-const GET_INFO_TIMEOUT = 1000 //ms
+const GET_INFO_TIMEOUT = 10000 //ms
 
 module.exports = (web3, options = {}) => {
   const defaultOptions = {
@@ -83,13 +83,13 @@ module.exports = (web3, options = {}) => {
       })
   }
 
-  function returnVersion (web3) {
+  function returnVersion (web3, getInfoTimeout = GET_INFO_TIMEOUT) {
     return (version) => {
       const versionInfo = {
         contractAddress: version.contractAddress,
         version: version.semanticVersion.join('.')
       }
-      return promiseTimeout(getApplicationInfo(web3.utils.hexToAscii(version.contentURI)), GET_INFO_TIMEOUT)
+      return promiseTimeout(getApplicationInfo(web3.utils.hexToAscii(version.contentURI)), getInfoTimeout)
         .then((info) => {
           return Object.assign(info, versionInfo)
         })
@@ -150,26 +150,26 @@ module.exports = (web3, options = {}) => {
           )
         )
     },
-    getVersion (appId, version) {
+    getVersion (appId, version, getInfoTimeout) {
       return this.getRepository(appId)
         .then((repository) =>
           repository.methods.getBySemanticVersion(version).call()
         )
-        .then(returnVersion(web3))
+        .then(returnVersion(web3, getInfoTimeout))
     },
-    getVersionById (appId, versionId) {
+    getVersionById (appId, versionId, getInfoTimeout) {
       return this.getRepository(appId)
         .then((repository) =>
           repository.methods.getByVersionId(versionId).call()
         )
-        .then(returnVersion(web3))
+        .then(returnVersion(web3, getInfoTimeout))
     },
-    getLatestVersion (appId) {
+    getLatestVersion (appId, getInfoTimeout) {
       return this.getRepository(appId)
         .then((repository) =>
           repository.methods.getLatest().call()
         )
-        .then(returnVersion(web3))
+        .then(returnVersion(web3, getInfoTimeout))
     },
     getLatestVersionContract (appId) {
       return this.getRepository(appId)
@@ -178,12 +178,12 @@ module.exports = (web3, options = {}) => {
         )
         .then(({ contractAddress }) => contractAddress)
     },
-    getLatestVersionForContract (appId, address) {
+    getLatestVersionForContract (appId, address, getInfoTimeout) {
       return this.getRepository(appId)
         .then((repository) =>
           repository.methods.getLatestForContractAddress(address).call()
         )
-        .then(returnVersion(web3))
+        .then(returnVersion(web3, getInfoTimeout))
     },
     getAllVersions (appId) {
       return this.getRepository(appId)
