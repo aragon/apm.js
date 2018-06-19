@@ -1,6 +1,6 @@
 {
   "name": "@aragon/apm",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "JavaScript library for the Aragon Package Manager",
   "main": "src/index.js",
   "scripts": {
