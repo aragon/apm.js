@@ -54,6 +54,10 @@ module.exports = (opts = {}) => {
      * @return {Promise} A promise that resolves to the content URI of the files
      */
     async uploadFiles (path) {
+      if (!ipfs) {
+        ipfs = initIPFS(opts.rpc)
+      }
+      
       const hashes = await ipfs.util.addFromFs(path, { recursive: true })
       const { hash } = hashes.pop()
 
