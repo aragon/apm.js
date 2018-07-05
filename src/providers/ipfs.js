@@ -33,9 +33,9 @@ module.exports = (opts = {}) => {
      *
      * @param {string} hash The content URI hash
      * @param {string} path The path to the file
-     * @return {Stream} A stream representing the content of the file
+     * @return {Promise} A promise that resolves to a stream representing the content of the file
      */
-    getFileStream (hash, path) {
+    async getFileStream (hash, path) {
       if (opts.gateway) {
         return httpProvider.getFileStream(`${opts.gateway}/${hash}`, path)
       }
