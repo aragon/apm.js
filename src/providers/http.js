@@ -1,4 +1,4 @@
-const got = require('got')
+const axios = require('axios')
 
 module.exports = (opts = {}) => {
   return {
@@ -12,8 +12,17 @@ module.exports = (opts = {}) => {
      * @return {Promise} A promise that resolves to the contents of the file
      */
     getFile (host, path) {
-      return got(`${host}/${path}`)
-        .then((response) => response.body)
+      return axios(`${host}/${path}`, {
+        responseType: 'text',
+
+        // This is needed to disable the default behavior of axios, which
+        // always tries to use JSON.parse() even if `responseType` is "text".
+        //
+        // See:
+        //   https://github.com/axios/axios/issues/907#issuecomment-322054564
+        //   https://github.com/axios/axios/issues/907#issuecomment-373988087
+        transformResponse: undefined,
+      }).then(response => response.data)
     },
 
     /**
@@ -21,10 +30,11 @@ module.exports = (opts = {}) => {
      *
      * @param {string} hash The content URI hash
      * @param {string} path The path to the file
-     * @return {Stream} A stream representing the content of the file
+     * @return {Promise} A promise resolving to a stream representing the content of the file
      */
-    getFileStream (host, path) {
-      return got.stream(`${host}/${path}`)
+    async getFileStream (host, path) {
+      return axios(`${host}/${path}`, { responseType: 'stream' })
+        .then(response => response.data)
     },
 
     /**
