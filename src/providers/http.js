@@ -1,6 +1,6 @@
 const axios = require('axios')
 
-module.exports = (opts = {}) => {
+module.exports = () => {
   return {
     identifier: 'http',
 
@@ -40,16 +40,16 @@ module.exports = (opts = {}) => {
     /**
      * Uploads all files from `path` and returns the content URI for those files.
      *
-     * @param {string} path The path that contains files to upload
+     * @param {string} url The url where the content will be served
      * @return {Promise} A promise that resolves to the content URI of the files
      */
-    async uploadFiles (path) {
+    async uploadFiles (url) {
       // We won't actually upload files since we will just
       // assume that files are available on this URL indefinitely.
       //
       // This is an OK assumption since this provider should really
       // only be used for development purposes.
-      return `http:${host}:${port}`
+      return `http:${url}`
     }
   }
 }
