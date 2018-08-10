@@ -1,7 +1,9 @@
-const ipfs = require('./providers/ipfs')
 const ens = require('./ens')
 const semver = require('semver')
 const promiseTimeout = require('./utils/timeout-promise.js')
+
+const ipfs = require('./providers/ipfs')
+const http = require('./providers/http')
 
 const GAS_FUZZ_FACTOR = 1.5
 const GET_INFO_TIMEOUT = 10000 //ms
@@ -18,7 +20,8 @@ module.exports = (web3, options = {}) => {
 
   // Set up providers
   const defaultProviders = {
-    ipfs: ipfs(options.ipfs)
+    ipfs: ipfs(options.ipfs),
+    http: http(),
   }
   const providers = Object.assign(
     defaultProviders,
