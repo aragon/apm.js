@@ -12,7 +12,7 @@ module.exports = () => {
      * @return {Promise} A promise that resolves to the contents of the file
      */
     getFile (host, path) {
-      return axios(`${host}/${path}`, {
+      return axios(`http://${host}/${path}`, {
         responseType: 'text',
 
         // This is needed to disable the default behavior of axios, which
@@ -43,7 +43,7 @@ module.exports = () => {
      * @param {string} url The url where the content will be served
      * @return {Promise} A promise that resolves to the content URI of the files
      */
-    async uploadFiles (url) {
+    uploadFiles (url) {
       // We won't actually upload files since we will just
       // assume that files are available on this URL indefinitely.
       //
