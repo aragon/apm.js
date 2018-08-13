@@ -12,7 +12,8 @@ module.exports = () => {
      * @return {Promise} A promise that resolves to the contents of the file
      */
     getFile (host, path) {
-      return axios(`http://${host}/${path}`, {
+      const protocol = new RegExp('^https?://').test(host) ? '' : 'http://'
+      return axios(`${protocol}${host}/${path}`, {
         responseType: 'text',
 
         // This is needed to disable the default behavior of axios, which
