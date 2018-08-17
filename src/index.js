@@ -62,6 +62,22 @@ module.exports = (web3, options = {}) => {
     version.split('.').map((part) => parseInt(part))
 
   const getApplicationInfo = (contentURI) => {
+    const [provider, location] = contentURI.split(/:(.+)/)
+    let error;
+
+    if (!provider || !location) {
+      error = `contentURI: ${contentURI} is invalid.`
+    } else if (!providers[provider]) {
+      error = `Provider: ${provider} is not supported`
+    }
+
+    if (error) {
+      return Promise.resolve({
+        error,
+        contentURI
+      })
+    }
+
     return Promise.all([
       readFileFromApplication(contentURI, 'manifest.json'),
       readFileFromApplication(contentURI, 'artifact.json')
@@ -69,7 +85,7 @@ module.exports = (web3, options = {}) => {
       .then((files) => files.map(JSON.parse))
       .then(
         ([ manifest, module ]) => {
-          const [provider, location] = contentURI.split(':')
+          const [provider, location] = contentURI.split(/:(.+)/)
 
           return Object.assign(
             manifest,
@@ -79,7 +95,7 @@ module.exports = (web3, options = {}) => {
         }
       )
       .catch(() => {
-        const [provider, location] = contentURI.split(':')
+        const [provider, location] = contentURI.split(/:(.+)/)
         return {
           content: { provider, location }
         }
