@@ -283,14 +283,11 @@ module.exports = (web3, options = {}) => {
       }
 
       try {
-        // Test that the call would actually succeed
-        await call.call({ from })
-
         // Return transaction to sign
         return {
           to: transactionDestination,
           data: call.encodeABI(),
-          gas: await call.estimateGas({ from }) * GAS_FUZZ_FACTOR,
+          gas: Math.round(await call.estimateGas({ from }) * GAS_FUZZ_FACTOR),
           gasPrice: web3.utils.toWei('10', 'gwei'),
           nonce: await web3.eth.getTransactionCount(manager)
         }
