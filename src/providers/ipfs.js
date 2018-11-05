@@ -2,7 +2,11 @@ const ipfsAPI = require('ipfs-api')
 const httpProvider = require('./http')()
 
 module.exports = (opts = {}) => {
-  const initIPFS = (rpc) => ipfsAPI(rpc)
+  // Backwards compatible API: If rpc is passed in options that is passed to IPFS,
+  // otherwise all options are provided
+  const initIPFS = (ipfsOptions) =>
+    ipfsAPI(ipfsOptions.rpc ? ipfsOptions.rpc : ipfsOptions)
+
   let ipfs
 
   return {
@@ -21,7 +25,7 @@ module.exports = (opts = {}) => {
       }
 
       if (!ipfs) {
-        ipfs = initIPFS(opts.rpc)
+        ipfs = initIPFS(opts)
       }
 
       return ipfs.files.cat(`${hash}/${path}`)
@@ -41,7 +45,7 @@ module.exports = (opts = {}) => {
       }
 
       if (!ipfs) {
-        ipfs = initIPFS(opts.rpc)
+        ipfs = initIPFS(opts)
       }
 
       return ipfs.files.catReadableStream(`${hash}/${path}`)
@@ -55,9 +59,9 @@ module.exports = (opts = {}) => {
      */
     async uploadFiles (path) {
       if (!ipfs) {
-        ipfs = initIPFS(opts.rpc)
+        ipfs = initIPFS(opts)
       }
-      
+
       const hashes = await ipfs.util.addFromFs(path, { recursive: true })
       const { hash } = hashes.pop()
 
