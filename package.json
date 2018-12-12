@@ -17,7 +17,7 @@
     "ethereum",
     "package-management"
   ],
-  "author": "Aragon Project <contact@aragon.one>",
+  "author": "Aragon Association <legal@aragon.org>",
   "license": "LGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/aragon/apm.js/issues"
