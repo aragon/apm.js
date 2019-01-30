@@ -61,7 +61,7 @@ module.exports = (web3, options = {}) => {
   const formatVersion = version =>
     version.split('.').map((part) => parseInt(part))
 
-  const getApplicationInfo = (contentURI) => {
+  const getApplicationInfo = (contentURI, getInfoTimeout = GET_INFO_TIMEOUT) => {
     const [provider, location] = contentURI.split(/:(.+)/)
     let error;
 
@@ -78,10 +78,13 @@ module.exports = (web3, options = {}) => {
       })
     }
 
-    return Promise.all([
-      readFileFromApplication(contentURI, 'manifest.json'),
-      readFileFromApplication(contentURI, 'artifact.json')
-    ])
+    return promiseTimeout(
+      Promise.all([
+        readFileFromApplication(contentURI, 'manifest.json'),
+        readFileFromApplication(contentURI, 'artifact.json')
+      ]),
+      getInfoTimeout
+    )
       .then((files) => files.map(JSON.parse))
       .then(
         ([ manifest, module ]) => {
@@ -102,13 +105,13 @@ module.exports = (web3, options = {}) => {
       })
   }
 
-  function returnVersion (web3, getInfoTimeout = GET_INFO_TIMEOUT) {
+  function returnVersion (web3, getInfoTimeout) {
     return (version) => {
       const versionInfo = {
         contractAddress: version.contractAddress,
         version: version.semanticVersion.join('.')
       }
-      return promiseTimeout(getApplicationInfo(web3.utils.hexToAscii(version.contentURI)), getInfoTimeout)
+      return getApplicationInfo(web3.utils.hexToAscii(version.contentURI), getInfoTimeout)
         .then((info) => {
           return Object.assign(info, versionInfo)
         })
