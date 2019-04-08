@@ -271,7 +271,7 @@ module.exports = (web3, options = {}) => {
     /**
      * Publishes a new version (`version`) of `appId` using storage provider `provider`.
      *
-     * If the destination repository, the intent will be for creating a new
+     * If the destination repository does not exist, the intent will be for creating a new
      * repository with an initial version.
      *
      * Returns an object with the needed components to execute an aragon.js intent
