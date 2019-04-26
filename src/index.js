@@ -123,6 +123,10 @@ module.exports = (web3, options = {}) => {
     return appId.split('.').slice(1).join('.')
   }
 
+  function getKernel (app) {
+    return app.methods.kernel().call()
+  }
+
   return {
     validInitialVersions: ['0.0.1', '0.1.0', '1.0.0'],
     getFile: readFileFromApplication,
@@ -230,19 +234,58 @@ module.exports = (web3, options = {}) => {
      * Publishes a new version (`version`) of `appId` using storage provider `provider`.
      *
      * If the destination repository does not exist, it falls back to creating a new
-     * repository with an initial version.
+     * repository with an initial version controlled by an initial manager.
      *
      * Returns the raw transaction to sign.
      *
-     * @param {string} manager The address that has access to manage this repository.
+     * @param {string} manager The address that will manage the new repo if it has to be created.
      * @param {string} appId The ENS name for the application repository.
      * @param {string} version A valid semantic version for this version.
      * @param {string} provider The name of an APM storage provider.
      * @param {string} directory The directory that contains files to publish.
      * @param {string} contract The new contract address for this version.
+     * @param {string} from The account address we should estimate the gas with
      * @return {Promise} A promise that resolves to a raw transaction
      */
     async publishVersion (manager, appId, version, provider, directory, contract, from) {
+      const {
+        targetContract,
+        name,
+        params
+      } = await this.publishVersionIntent(manager, appId, version, provider, directory, contract)
+
+      try {
+        const call = targetContract.methods[name](...params)
+
+        // Return transaction to sign
+        return {
+          to: targetContract.options.address,
+          data: call.encodeABI(),
+          gas: Math.round(await call.estimateGas({ from }) * GAS_FUZZ_FACTOR),
+          gasPrice: web3.utils.toWei('10', 'gwei')
+        }
+      } catch (err) {
+        throw new Error(`Transaction would not succeed ("${err.message}")`)
+      }
+    },
+
+    /**
+     * Create an intent to publish a new version (`version`) of `appId` using storage provider `provider`.
+     *
+     * If the destination repository does not exist, the intent will be for creating a new
+     * repository with an initial version.
+     *
+     * Returns an object with the needed components to execute an aragon.js intent
+     *
+     * @param {string} manager The address that will manage the new repo if it has to be created.
+     * @param {string} appId The ENS name for the application repository.
+     * @param {string} version A valid semantic version for this version.
+     * @param {string} provider The name of an APM storage provider.
+     * @param {string} directory The directory that contains files to publish.
+     * @param {string} contract The new contract address for this version.
+     * @return {Promise} A promise that resolves to an aragon.js intent
+     */
+    async publishVersionIntent(manager, appId, version, provider, directory, contract) {
       if (!semver.valid(version)) {
         throw new Error(`${version} is not a valid semantic version`)
       }
@@ -260,43 +303,40 @@ module.exports = (web3, options = {}) => {
       const repo = await this.getRepository(appId)
         .catch(() => null)
 
-      // Default call creates a new repository and publishes the initial version
-      const repoRegistry = await this.getRepoRegistry(appId)
-        .catch(() => {
-          throw new Error(`Repository ${appId} does not exist and it's registry does not exist`)
-        })
-
-      let transactionDestination = repoRegistry.options.address
-      let call = repoRegistry.methods.newRepoWithVersion(
-        appId.split('.')[0],
-        manager,
-        formatVersion(version),
-        contract,
-        `0x${contentURI}`
-      )
-
-      // If the repository already exists, the call publishes a new version
+      // If the repo exists, create a new version in the repo
       if (repo !== null) {
-        transactionDestination = repo.options.address
-        call = repo.methods.newVersion(
-          formatVersion(version),
-          contract,
-          `0x${contentURI}`
-        )
-      }
-
-      try {
-        // Return transaction to sign
         return {
-          to: transactionDestination,
-          data: call.encodeABI(),
-          gas: Math.round(await call.estimateGas({ from }) * GAS_FUZZ_FACTOR),
-          gasPrice: web3.utils.toWei('10', 'gwei'),
-          nonce: await web3.eth.getTransactionCount(manager)
+          dao: await getKernel(repo),
+          proxyAddress: repo.options.address,
+          methodName: 'newVersion',
+          params: [
+            formatVersion(version),
+            contract,
+            `0x${contentURI}`
+          ],
+          targetContract: repo
         }
-      } catch (err) {
-        throw new Error(`Transaction would not succeed ("${err.message}")`)
+      } else {
+        // If the repo does not exist yet, the intent will be for creating a repo with the first version
+        const repoRegistry = await this.getRepoRegistry(appId)
+          .catch(() => {
+            throw new Error(`Repository ${appId} does not exist and its registry does not exist`)
+          })
+
+        return {
+          dao: await getKernel(repoRegistry),
+          proxyAddress: repoRegistry.options.address,
+          methodName: 'newRepoWithVersion',
+          params: [
+            appId.split('.')[0],
+            manager,
+            formatVersion(version),
+            contract,
+            `0x${contentURI}`
+          ],
+          targetContract: repoRegistry
+        }
       }
-    }
+    },
   }
 }
