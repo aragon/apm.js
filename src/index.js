@@ -269,7 +269,7 @@ module.exports = (web3, options = {}) => {
     },
 
     /**
-     * Publishes a new version (`version`) of `appId` using storage provider `provider`.
+     * Create an intent to publish a new version (`version`) of `appId` using storage provider `provider`.
      *
      * If the destination repository does not exist, the intent will be for creating a new
      * repository with an initial version.
@@ -319,7 +319,7 @@ module.exports = (web3, options = {}) => {
         // If the repo does not exist yet, the intent will be for creating a repo with the first version
         const repoRegistry = await this.getRepoRegistry(appId)
           .catch(() => {
-            throw new Error(`Repository ${appId} does not exist and it's registry does not exist`)
+            throw new Error(`Repository ${appId} does not exist and its registry does not exist`)
           })
 
         return {
