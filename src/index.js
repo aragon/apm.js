@@ -123,6 +123,10 @@ module.exports = (web3, options = {}) => {
     return appId.split('.').slice(1).join('.')
   }
 
+  function getKernel (app) {
+    return app.methods.kernel().call()
+  }
+
   return {
     validInitialVersions: ['0.0.1', '0.1.0', '1.0.0'],
     getFile: readFileFromApplication,
@@ -226,9 +230,6 @@ module.exports = (web3, options = {}) => {
           repo.methods.isValidBump(formatVersion(fromVersion), formatVersion(toVersion)).call()
         ))
     },
-    getKernel (app) {
-      return app.methods.kernel().call()
-    },
     /**
      * Publishes a new version (`version`) of `appId` using storage provider `provider`.
      *
@@ -243,6 +244,7 @@ module.exports = (web3, options = {}) => {
      * @param {string} provider The name of an APM storage provider.
      * @param {string} directory The directory that contains files to publish.
      * @param {string} contract The new contract address for this version.
+     * @param {string} from The account address we should estimate the gas with
      * @return {Promise} A promise that resolves to a raw transaction
      */
     async publishVersion (manager, appId, version, provider, directory, contract, from) {
@@ -260,8 +262,7 @@ module.exports = (web3, options = {}) => {
           to: targetContract.options.address,
           data: call.encodeABI(),
           gas: Math.round(await call.estimateGas({ from }) * GAS_FUZZ_FACTOR),
-          gasPrice: web3.utils.toWei('10', 'gwei'),
-          nonce: await web3.eth.getTransactionCount(manager)
+          gasPrice: web3.utils.toWei('10', 'gwei')
         }
       } catch (err) {
         throw new Error(`Transaction would not succeed ("${err.message}")`)
@@ -305,9 +306,9 @@ module.exports = (web3, options = {}) => {
       // If the repo exists, create a new version in the repo
       if (repo !== null) {
         return {
-          dao: await this.getKernel(repo),
+          dao: await getKernel(repo),
           proxyAddress: repo.options.address,
-          name: 'newVersion',
+          methodName: 'newVersion',
           params: [
             formatVersion(version),
             contract,
@@ -323,9 +324,9 @@ module.exports = (web3, options = {}) => {
           })
 
         return {
-          dao: await this.getKernel(repoRegistry),
+          dao: await getKernel(repoRegistry),
           proxyAddress: repoRegistry.options.address,
-          name: 'newRepoWithVersion',
+          methodName: 'newRepoWithVersion',
           params: [
             appId.split('.')[0],
             manager,
