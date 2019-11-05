@@ -1,4 +1,4 @@
-const ipfsAPI = require('ipfs-api')
+const ipfsAPI = require('ipfs-http-client')
 const httpProvider = require('./http')()
 
 module.exports = (opts = {}) => {
@@ -28,7 +28,7 @@ module.exports = (opts = {}) => {
         ipfs = initIPFS(opts)
       }
 
-      return ipfs.files.cat(`${hash}/${path}`)
+      return ipfs.cat(`${hash}/${path}`)
         .then((file) => file.toString('utf8'))
     },
 
@@ -48,7 +48,7 @@ module.exports = (opts = {}) => {
         ipfs = initIPFS(opts)
       }
 
-      return ipfs.files.catReadableStream(`${hash}/${path}`)
+      return ipfs.catReadableStream(`${hash}/${path}`)
     },
 
     /**
@@ -62,7 +62,7 @@ module.exports = (opts = {}) => {
         ipfs = initIPFS(opts)
       }
 
-      const hashes = await ipfs.util.addFromFs(path, { recursive: true })
+      const hashes = await ipfs.addFromFs(path, { recursive: true })
       const { hash } = hashes.pop()
 
       return `ipfs:${hash}`
