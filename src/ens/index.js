@@ -1,6 +1,6 @@
-const ENS = require('ethjs-ens')
+import ENS from 'ethjs-ens';
 
-module.exports = {
+export default {
   resolve (nameOrNode, opts = {}) {
     const isName = nameOrNode.includes('.')
 
@@ -16,4 +16,4 @@ module.exports = {
 
     return ens.resolveAddressForNode(nameOrNode)
   }
-}
+};
