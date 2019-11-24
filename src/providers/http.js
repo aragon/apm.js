@@ -1,6 +1,6 @@
-const axios = require('axios')
+import axios from 'axios';
 
-module.exports = () => {
+export default () => {
   return {
     identifier: 'http',
 
@@ -53,4 +53,4 @@ module.exports = () => {
       return `http:${url}`
     }
   }
-}
+};

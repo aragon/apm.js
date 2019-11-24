@@ -1,11 +1,13 @@
-const ipfsAPI = require('ipfs-http-client')
-const httpProvider = require('./http')()
+import ipfsFilesAPI from 'ipfs-http-client/src/files-regular'
+import httpProviderFactory from './http'
+//
+const httpProvider = httpProviderFactory()
 
-module.exports = (opts = {}) => {
+export default (opts = {}) => {
   // Backwards compatible API: If rpc is passed in options that is passed to IPFS,
   // otherwise all options are provided
-  const initIPFS = (ipfsOptions) =>
-    ipfsAPI(ipfsOptions.rpc ? ipfsOptions.rpc : ipfsOptions)
+  const initIPFS = ipfsOptions =>
+    ipfsFilesAPI(ipfsOptions.rpc ? ipfsOptions.rpc : ipfsOptions)
 
   let ipfs
 
@@ -19,7 +21,7 @@ module.exports = (opts = {}) => {
      * @param {string} path The path to the file
      * @return {Promise} A promise that resolves to the contents of the file
      */
-    getFile (hash, path) {
+    getFile(hash, path) {
       if (opts.gateway) {
         return httpProvider.getFile(`${opts.gateway}/${hash}`, path)
       }
@@ -28,8 +30,7 @@ module.exports = (opts = {}) => {
         ipfs = initIPFS(opts)
       }
 
-      return ipfs.cat(`${hash}/${path}`)
-        .then((file) => file.toString('utf8'))
+      return ipfs.cat(`${hash}/${path}`).then(file => file.toString('utf8'))
     },
 
     /**
@@ -39,7 +40,7 @@ module.exports = (opts = {}) => {
      * @param {string} path The path to the file
      * @return {Promise} A promise that resolves to a stream representing the content of the file
      */
-    async getFileStream (hash, path) {
+    async getFileStream(hash, path) {
       if (opts.gateway) {
         return httpProvider.getFileStream(`${opts.gateway}/${hash}`, path)
       }
@@ -57,7 +58,7 @@ module.exports = (opts = {}) => {
      * @param {string} path The path that contains files to upload
      * @return {Promise} A promise that resolves to the content URI of the files
      */
-    async uploadFiles (path) {
+    async uploadFiles(path) {
       if (!ipfs) {
         ipfs = initIPFS(opts)
       }
@@ -66,6 +67,6 @@ module.exports = (opts = {}) => {
       const { hash } = hashes.pop()
 
       return `ipfs:${hash}`
-    }
+    },
   }
 }

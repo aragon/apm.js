@@ -1,5 +1,5 @@
 // https://italonascimento.github.io/applying-a-timeout-to-your-promises/
-module.exports = function(promise, ms) {
+export default function(promise, ms) {
 
   // Create a promise that rejects in <ms> milliseconds
   const timeout = new Promise((resolve, reject) => {
@@ -13,4 +13,4 @@ module.exports = function(promise, ms) {
     promise,
     timeout
   ])
-}
+};
