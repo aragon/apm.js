@@ -17,18 +17,19 @@ module.exports = (opts = {}) => {
      *
      * @param {string} hash The content URI hash
      * @param {string} path The path to the file
+     * @param {string|number} [timeout] HTTP request timeout
      * @return {Promise} A promise that resolves to the contents of the file
      */
-    getFile (hash, path) {
+    getFile (hash, path, timeout) {
       if (opts.gateway) {
-        return httpProvider.getFile(`${opts.gateway}/${hash}`, path)
+        return httpProvider.getFile(`${opts.gateway}/${hash}`, path, timeout)
       }
 
       if (!ipfs) {
         ipfs = initIPFS(opts)
       }
 
-      return ipfs.cat(`${hash}/${path}`)
+      return ipfs.cat(`${hash}/${path}`, { timeout })
         .then((file) => file.toString('utf8'))
     },
 
