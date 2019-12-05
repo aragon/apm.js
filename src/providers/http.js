@@ -24,6 +24,11 @@ module.exports = () => {
         //   https://github.com/axios/axios/issues/907#issuecomment-322054564
         //   https://github.com/axios/axios/issues/907#issuecomment-373988087
         transformResponse: undefined,
+        // WARNING! Don't use axios (v0.18.x) timeout, it causes the same issue creating
+        // a long open handler
+        // [WTF Node?] open handles:
+        // - Timers:
+        // - (300000 ~ 5 min) handleRequestTimeout @ /aragon/aragon-cli/packages/aragon-cli/node_modules/axios/lib/adapters/http.js:215
         timeout
       }).then(response => response.data)
     },
