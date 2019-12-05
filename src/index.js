@@ -1,6 +1,5 @@
 const ens = require('./ens')
 const semver = require('semver')
-const promiseTimeout = require('./utils/timeout-promise.js')
 
 const ipfs = require('./providers/ipfs')
 const http = require('./providers/http')
@@ -48,9 +47,9 @@ module.exports = (web3, options = {}) => {
     return { provider: providers[contentProvider], location: contentLocation }
   }
 
-  const readFileFromApplication = (contentURI, path) => {
+  const readFileFromApplication = (contentURI, path, timeout) => {
     const { provider, location } = getProviderFromURI(contentURI, path)
-    return provider.getFile(location, path)
+    return provider.getFile(location, path, timeout)
   }
 
   const readFileStreamFromApplication = (contentURI, path) => {
@@ -78,31 +77,28 @@ module.exports = (web3, options = {}) => {
       })
     }
 
-    return promiseTimeout(
-      Promise.all([
-        readFileFromApplication(contentURI, 'manifest.json'),
-        readFileFromApplication(contentURI, 'artifact.json')
-      ]),
-      getInfoTimeout
-    )
-      .then((files) => files.map(JSON.parse))
-      .then(
-        ([ manifest, module ]) => {
-          const [provider, location] = contentURI.split(/:(.+)/)
-
-          return Object.assign(
-            manifest,
-            module,
-            { content: { provider, location } }
-          )
-        }
-      )
-      .catch(() => {
+    return Promise.all([
+      readFileFromApplication(contentURI, 'manifest.json', getInfoTimeout),
+      readFileFromApplication(contentURI, 'artifact.json', getInfoTimeout)
+    ])
+    .then((files) => files.map(JSON.parse))
+    .then(
+      ([ manifest, module ]) => {
         const [provider, location] = contentURI.split(/:(.+)/)
-        return {
-          content: { provider, location }
-        }
-      })
+
+        return Object.assign(
+          manifest,
+          module,
+          { content: { provider, location } }
+        )
+      }
+    )
+    .catch(() => {
+      const [provider, location] = contentURI.split(/:(.+)/)
+      return {
+        content: { provider, location }
+      }
+    })
   }
 
   function returnVersion (web3, getInfoTimeout) {
