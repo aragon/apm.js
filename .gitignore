@@ -1,6 +1,11 @@
 # Dependencies
 node_modules
 
-# yarn
-yarn.lock
+# Cache
+.cache/
+
+# logs
 yarn-error.log
+
+## Lockfiles
+yarn.lock
