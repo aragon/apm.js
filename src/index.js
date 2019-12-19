@@ -250,12 +250,12 @@ module.exports = (web3, options = {}) => {
     async publishVersion (manager, appId, version, provider, directory, contract, from) {
       const {
         targetContract,
-        name,
+        methodName,
         params
       } = await this.publishVersionIntent(manager, appId, version, provider, directory, contract)
 
       try {
-        const call = targetContract.methods[name](...params)
+        const call = targetContract.methods[methodName](...params)
 
         // Return transaction to sign
         return {
