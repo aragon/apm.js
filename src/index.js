@@ -211,7 +211,7 @@ module.exports = (web3, options = {}) => {
         )
         .then(returnVersion(web3, getInfoTimeout))
     },
-    getAllVersions (appId) {
+    getAllVersions (appId, getInfoTimeout) {
       return this.getRepository(appId)
         .then((repository) =>
           repository.methods.getVersionsCount().call()
@@ -219,7 +219,7 @@ module.exports = (web3, options = {}) => {
         .then((versionCount) => {
           const versions = []
           for (let i = 1; i <= versionCount; i++) {
-            versions.push(this.getVersionById(appId, i))
+            versions.push(this.getVersionById(appId, i, getInfoTimeout))
           }
           return Promise.all(versions)
         })
