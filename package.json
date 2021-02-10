@@ -28,6 +28,7 @@
     "axios": "^0.18.0",
     "ethjs-ens": "^2.0.1",
     "ipfs-api": "^26.1.2",
+    "ipfs-http-client": "^49.0.2",
     "semver": "^5.5.0"
   }
 }
