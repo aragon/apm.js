@@ -1,3 +1,4 @@
+globalThis = global
 const createClient = require('ipfs-http-client')
 const httpProvider = require('./http')()
 
