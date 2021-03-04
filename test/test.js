@@ -1,22 +1,28 @@
 const APM = require("../src")
 const { 
-  getLocalWeb3, 
-  getApmRegistryName, 
+  DEFAULT_IPFS_TIMEOUT,
+  getLocalWeb3,
+  getApmRegistryName,
   getApmOptions,
-  DEFAULT_IPFS_TIMEOUT
 } = require("./test-helpers")
 
-let web3, apmRegistryName, apmOptions, apm
+const posttest = require("./posttest")
+
+let web3, apmRegistryName, apmOptions, apm, accounts
 
 /* Setup and cleanup */
 jest.setTimeout(60000)
 beforeAll(async () => {
   web3 = await getLocalWeb3()
+  accounts = await web3.eth.getAccounts()
 
   apmRegistryName = getApmRegistryName()
   apmOptions = getApmOptions()
   apm = APM(web3, apmOptions)
+})
 
+afterAll(async () => {
+  await posttest()
 })
 
 test("APM exists", () => {
@@ -72,11 +78,38 @@ test("getAllVersions", async () => {
   expect(allVersions[0].content.provider).toBe('ipfs')
 })
 
-// TODO
-test.skip("publishVersion", async () => {
-  
+test("publishVersion", async () => {
+  const publishTx = await apm.publishVersion(
+    accounts[0], 
+    "newapp.aragonpm.eth", 
+    "1.0.0", 
+    "http", 
+    "./tmp", 
+    accounts[0], 
+    accounts[0]
+  )
+
+  expect(publishTx).toBeDefined()
+  expect(publishTx.data).toBeDefined()
+  expect(Number(publishTx.gas)).toBeGreaterThan(0)
+  expect(Number(publishTx.gasPrice)).toBeGreaterThanOrEqual(1e9)
+  expect(publishTx.to.startsWith("0x")).toBe(true)
 })
 
-test.skip("publishVersionIntent", async () => {
+test("publishVersionIntent", async () => {
+  const intent = await apm.publishVersionIntent(
+    accounts[0],
+    "newapp.aragonpm.eth",
+    "1.0.0",
+    "http",
+    "./tmp",
+    accounts[0]
+  )
 
+  expect(intent).toBeDefined()
+  expect(intent.dao.startsWith("0x")).toBe(true)
+  expect(intent.methodName).toBe("newRepoWithVersion")
+  expect(intent.params.length).toBe(5)
+  expect(intent.proxyAddress.startsWith("0x")).toBe(true)
+  expect(intent.targetContract).toBeDefined()
 })

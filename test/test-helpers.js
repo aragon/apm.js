@@ -34,8 +34,8 @@ function getApmOptions() {
 }
 
 module.exports = {
-  getApmOptions,
-  getApmRegistryName,
+  DEFAULT_IPFS_TIMEOUT,
   getLocalWeb3,
-  DEFAULT_IPFS_TIMEOUT
+  getApmRegistryName,
+  getApmOptions,
 }
