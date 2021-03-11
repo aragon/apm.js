@@ -1,12 +1,11 @@
-globalThis = global
-const createClient = require('ipfs-http-client')
+const ipfsAPI = require('ipfs-api')
 const httpProvider = require('./http')()
 
 module.exports = (opts = {}) => {
   // Backwards compatible API: If rpc is passed in options that is passed to IPFS,
   // otherwise all options are provided
   const initIPFS = (ipfsOptions) =>
-    ipfsOptions.rpc ? createClient(ipfsOptions.rpc) : createClient()
+    ipfsAPI(ipfsOptions.rpc ? ipfsOptions.rpc : ipfsOptions)
 
   let ipfs
 
