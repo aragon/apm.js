@@ -25,7 +25,7 @@
   "homepage": "https://github.com/aragon/apm.js#readme",
   "dependencies": {
     "@aragon/os": "^4.0.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "ethjs-ens": "^2.0.1",
     "ipfs-http-client": "^49.0.2",
     "it-all": "^1.0.5",
