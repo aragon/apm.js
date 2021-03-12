@@ -1,11 +1,13 @@
-const ipfsAPI = require('ipfs-api')
+globalThis = global
+const createClient = require('ipfs-http-client')
 const httpProvider = require('./http')()
+const all = require('it-all')
 
 module.exports = (opts = {}) => {
   // Backwards compatible API: If rpc is passed in options that is passed to IPFS,
   // otherwise all options are provided
   const initIPFS = (ipfsOptions) =>
-    ipfsAPI(ipfsOptions.rpc ? ipfsOptions.rpc : ipfsOptions)
+    ipfsOptions.rpc ? createClient(ipfsOptions.rpc) : createClient(ipfsOptions)
 
   let ipfs
 
@@ -19,7 +21,7 @@ module.exports = (opts = {}) => {
      * @param {string} path The path to the file
      * @return {Promise} A promise that resolves to the contents of the file
      */
-    getFile (hash, path) {
+    async getFile (hash, path) {
       if (opts.gateway) {
         return httpProvider.getFile(`${opts.gateway}/${hash}`, path)
       }
@@ -28,8 +30,9 @@ module.exports = (opts = {}) => {
         ipfs = initIPFS(opts)
       }
 
-      return ipfs.files.cat(`${hash}/${path}`)
-        .then((file) => file.toString('utf8'))
+      const file = await all(ipfs.cat(`${hash}/${path}`))
+
+      return file.toString('utf8')
     },
 
     /**
